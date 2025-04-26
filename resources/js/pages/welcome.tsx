@@ -1,13 +1,9 @@
-import { type SharedData } from '@/types';
-import { Head, Link, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 import axios from 'axios';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 
 export default function Welcome() {
-    const { auth } = usePage<SharedData>().props;
-
     const [macAddress, setMacAddress] = useState('');
     const [macAddressLookupResults, setMacAddressLookupResults] = useState<{
         mac_addresses: { vendor: string, mac_address: string }[];
@@ -109,15 +105,6 @@ export default function Welcome() {
 
     const handleMacAddressChange = (e) => {
         setMacAddress(e.target.value);
-    }
-
-    const handleRemovingErrorsOnEmptyInput = () => {
-        if(macAddressLookupResults.errors.length > 0 && macAddress.length === 0) {
-            setMacAddressLookupResults({
-                ...macAddressLookupResults,
-                errors: []
-            });
-        }
     }
 
     return (
