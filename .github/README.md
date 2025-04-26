@@ -1,7 +1,7 @@
 ### Instructions
 
 # Prerequisites
-- PHP 8.3+, Nodejs, Composer & MYSQL
+- PHP 8.3+, Nodejs v21.7.1+, Composer v2.2.25+ & MYSQL
 
 # Setup
 - git clone git@github.com:soghammed/glide.git (using ssh) or https://github.com/soghammed/glide.git (using https)
