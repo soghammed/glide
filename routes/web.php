@@ -8,9 +8,6 @@ Route::get('/', function () {
     return Inertia::render('welcome');
 })->name('home');
 
-Route::get('/mac-lookup', [MacLookupController::class, 'getVendor'])->name('mac_address.lookup');
-Route::post('/mac-lookup', [MacLookupController::class, 'getVendors'])->name('mac_address.lookup.post');
-
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', function () {
         return Inertia::render('dashboard');

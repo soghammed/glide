@@ -27,10 +27,8 @@ export default function Welcome() {
             setLoading(false);
             setMacAddressLookupResults(res.data);
         }catch(error) {
-            console.error('Error fetching MAC address:', axios.isAxiosError(error));
             setLoading(false);
             if (axios.isAxiosError(error) && error.response && error.response.data) {
-                console.log('here', error.response.data.errors.mac_address);
                 setMacAddressLookupResults({
                     mac_addresses: [],
                     errors: error.response.data.errors.mac_address
