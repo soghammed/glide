@@ -23,7 +23,7 @@ class DeviceOui extends Model
             //strip out unwanted characters
             $mac_a_without_characters = preg_replace('/[^A-F0-9]/', '', $mac_a);
             
-            $mac_address_is_valid = self::validateMacAddress($mac_a_without_characters);
+            $mac_address_is_valid = strlen($mac_a_without_characters) === 12;
             
             //handle not valid
             if(!$mac_address_is_valid){
@@ -32,7 +32,7 @@ class DeviceOui extends Model
             }
 
             //handle valid mac address
-            $oui = self::extractOuiFromMacAddress($mac_a_without_characters);
+            $oui = substr($mac_address, 0, 6);
             
             // add to oui for lookup
             $lookup_mac_addresses[] = $oui;
@@ -65,16 +65,5 @@ class DeviceOui extends Model
             'mac_addresses' => $result,
             'errors' => $errors,
         ], 200);
-    }
-
-    public static function validateMacAddress($mac_address)
-    {
-        return strlen($mac_address) == 12;
-    }
-
-    public static function extractOuiFromMacAddress($mac_address)
-    {
-        $mac_address = preg_replace('/[^A-F0-9]/', '', $mac_address);
-        return substr($mac_address, 0, 6);
     }
 }
