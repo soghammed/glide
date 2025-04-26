@@ -32,7 +32,7 @@ class DeviceOui extends Model
             }
 
             //handle valid mac address
-            $oui = substr($mac_address, 0, 6);
+            $oui = substr($mac_a_without_characters, 0, 6);
             
             // add to oui for lookup
             $lookup_mac_addresses[] = $oui;

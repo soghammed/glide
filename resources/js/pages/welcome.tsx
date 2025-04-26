@@ -1,6 +1,6 @@
 import { type SharedData } from '@/types';
 import { Head, Link, usePage } from '@inertiajs/react';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import axios from 'axios';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -19,6 +19,8 @@ export default function Welcome() {
     const [loading, setLoading] = useState(false);
 
     const submit = async () => {
+        if(macAddress.length === 0) return alert('Please enter a MAC address');
+
         setLoading(true);
         try {
             const res = await axios.post(route('mac_address.lookup.post'), {
@@ -38,39 +40,41 @@ export default function Welcome() {
     }
 
     const displayMacAddressLookupResults = () => {
-        if (loading) {
-            return <div className="text-center">Loading...</div>;
-        }
+        if(loading) return false;
         if (macAddressLookupResults.mac_addresses?.length > 0) {
             return (
                 <>
-                    <div className="border-l-3 border-green-500 p-4">
-                        <h2 className="text-lg font-bold">{macAddressLookupResults.mac_addresses.length } Vendor(s) Found</h2>
-                        <ul>
-                            {macAddressLookupResults.mac_addresses.map((entry, index) => (
-                                <>
-                                    <li className="mt-3 mb-3" key={index}>
-                                        <div className="w-80 flex flex-row justify-between">
-                                            <span className="text-gray-500">Mac Address:</span> 
-                                            <span className="">{entry.mac_address}</span>
-                                        </div>
-                                        <div className="w-80 flex flex-row justify-between">
-                                            <span className="text-gray-500">Vendor:</span> 
-                                            <span className="">{entry.vendor}</span>
-                                        </div>
-                                    </li>
-                                    { macAddressLookupResults.mac_addresses.length !== index+1 ? (<hr/>) : null}
-                                </>
-                            ))}
-                        </ul>
-                    </div>
+                    <h2 className="text-lg font-bold">{macAddressLookupResults.mac_addresses.length } Vendor(s) Found</h2>
+                    <ul>
+                        {macAddressLookupResults.mac_addresses.map((entry, index) => (
+                            <>
+                                <li className="mt-3 mb-3 border-l-3 border-green-500 p-4" key={index}>
+                                    <div className="w-full flex flex-row justify-between">
+                                        <span className="text-gray-500">Mac Address:</span> 
+                                        <span className="">{entry.mac_address}</span>
+                                    </div>
+                                    <div className="w-full flex flex-row justify-between">
+                                        <span className="text-gray-500">Vendor:</span> 
+                                        <span className="">{entry.vendor}</span>
+                                    </div>
+                                </li>
+                            </>
+                        ))}
+                    </ul>
                 </>
             );
-        } else if (macAddressLookupResults.mac_addresses.length === 0 && !macAddress) {
+        } else if (macAddressLookupResults.mac_addresses.length === 0 && macAddressLookupResults.errors.length === 0 && macAddress && !loading) {
             return (
-                <div>
+                <div className="flex flex-col justify-center items-center">
+                    <span className="text-5xl">💬</span> 
+                    <span>Typing...</span>
+                </div>
+            )
+        } else if (macAddressLookupResults.mac_addresses.length === 0 && macAddressLookupResults.errors.length === 0 && !macAddress) {
+            return (
+                <div className="flex flex-col justify-center items-center">
+                    <span className="text-5xl">🤓</span> 
                     <span>Waiting for a MAC address...</span>
-                    <span className="text-5xl">🙄</span> 
                 </div>
                 
             );
@@ -78,20 +82,26 @@ export default function Welcome() {
     }
 
     const displayErrorsMacAddressLookupErrors = () => {
+        if(loading) {
+            return (
+                <div className="flex flex-col justify-center items-center">
+                    <span className="text-5xl">🔍</span> 
+                    <span>Loading...</span>
+                </div>
+            );
+        }
         if (macAddressLookupResults.errors.length > 0) {
             return (
                 <>
-                    <div className="border-l-3 border-red-500 p-4">
-                        <h2 className="text-red-500 text-lg font-semibold">{macAddressLookupResults.errors.length } Error(s) found</h2>
-                        <ul>
-                            {macAddressLookupResults.errors.map((error, index) => (
-                                <>
-                                    <li className="mt-2 mb-2" key={index}>{error}</li>
-                                    { macAddressLookupResults.errors.length !== index+1 ? (<hr/>) : null}
-                                </>
-                            ))}
-                        </ul>
-                    </div>
+                    <h2 className="text-red-500 text-lg font-semibold">{macAddressLookupResults.errors.length } Error(s) found</h2>
+                    <ul>
+                        {macAddressLookupResults.errors.map((error, index) => (
+                            <>
+                                <li className="mt-2 mb-2 border-l-3 border-red-500 p-4" key={index}>{error}</li>
+                                { macAddressLookupResults.errors.length !== index+1 ? (<hr/>) : null}
+                            </>
+                        ))}
+                    </ul>
                 </>
             );
         }   
@@ -110,10 +120,6 @@ export default function Welcome() {
         }
     }
 
-    useEffect( () => {
-        handleRemovingErrorsOnEmptyInput();
-    }, [macAddress]);
-
     return (
         <>
             <div className="flex min-h-screen flex-col items-center bg-[#FDFDFC] p-6 lg:justify-center lg:p-8 dark:bg-[#0a0a0a]">
@@ -128,13 +134,15 @@ export default function Welcome() {
                                 value={macAddress}
                                 onChange={handleMacAddressChange}
                                 />
-                            <Button onClick={submit}>Search</Button>
+                            <Button onClick={submit} className="bg-indigo-500" disabled={loading}>
+                                {loading ? 'Loading...' : 'Lookup'}
+                            </Button>
                         </div>
-
-                        <div class="mb-2">
+                        <div className="text-sm text-gray-500 mb-4">Tip: use comma delimited format to search multiple mac addresses</div>
+                        <div className="mb-2">
                             {displayErrorsMacAddressLookupErrors()}
                         </div>
-                        <div class="mt-2">
+                        <div className="mt-2">
                             {displayMacAddressLookupResults()}
                         </div>
                     </main>
